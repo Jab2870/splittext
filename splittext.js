@@ -202,7 +202,6 @@ function SplitText(identifier, vars){
 			}
 		}
 
-		console.log(currentLists);
 
 
 
@@ -278,10 +277,4 @@ function SplitText(identifier, vars){
 		this.chars = this.chars.concat(currentLists.chars);
 
 	}
-
-
-	
-
-	
-
 }
