@@ -241,11 +241,6 @@ function SplitText(identifier, vars){
 				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;' " + ((st.vars.charsClass!==undefined && st.vars.charsClass!="undefined")?"class='"+this.vars.charsClass+"' ":"") + ">";
 				var endTag = "</div>";
 				parent.innerHTML = startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag;
-				// console.log(parent.innerHTML);
-				// console.log(parent.innerHTML.split(""));
-				// console.log(parent.innerHTML.split("").join(endTag+startTag));
-				// console.log(startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag);
-				// console.log("******");
 
 				var nodes = parent.querySelectorAll("div");
 
