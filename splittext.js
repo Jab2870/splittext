@@ -12,6 +12,11 @@ function SplitText(identifier, vars){
 		}
 	}
 
+	String.prototype.replaceAll = function(search, replacement) {
+	    var target = this;
+	    return target.split(search).join(replacement);
+	};
+
 	var identifier = identifier || [];
 	var defaults = {
 		type: "chars,words,lines",
@@ -140,6 +145,11 @@ function SplitText(identifier, vars){
 	for(var i = 0;i<this.HTMLobjects.length;i++){
 			
 		var current = this.HTMLobjects[i];
+
+		//remove tags from element
+		//ideally, this won't be needed in the future
+		current.innerHTML = current.innerHTML.replace(/<\/?[^>]+(>|$)/g, "");
+
 		var currentLists = {
 			lines:[],
 			words:[],
@@ -193,28 +203,35 @@ function SplitText(identifier, vars){
 		}
 
 
+
+
+
 		//split the words
-
-		
-
 		if(this.vars.type.indexOf("words")!=-1){
-			function splitWords(parent){
-				console.log(parent);
+			function splitWords(parent,st){
+				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;' " + ((st.vars.wordsClass!==undefined && st.vars.wordsClass!="undefined")?"class='"+this.vars.wordsClass+"' ":"") + ">";
+				var endTag = "</div>";
+				parent.innerHTML = startTag + parent.innerHTML.replaceAll(" ",(endTag+ " " +startTag)) + endTag;
+
+				
 			}
 
 			//if it has been split by lines, split each line by words
 			if(this.vars.type.indexOf("lines")!=-1){
 				for(var j = 0; j<currentLists.lines.length;j++){
-					splitWords(currentLists.lines[j]);
+					splitWords(currentLists.lines[j], this);
 				}
 			} else {
-				splitWords(current);
+				splitWords(current, this);
 			}
 
 
 		}
 
 
+		this.lines.concat(currentLists.lines);
+		this.words.concat(currentLists.words);
+		this.chars.concat(currentLists.chars);
 
 	}
 
