@@ -23,8 +23,12 @@ function SplitText(identifier, vars){
 
 
 	this.HTMLobjects=[];
-	this.vars;
+	this.vars = {};
 	this.originalHTML = [];
+
+	this.lines = [];
+	this.words = [];
+	this.chars = [];
 
 	//if the identifier isn't an array, make it one.  If it already is, don't worry.  :)
 	if(!Array.isArray(identifier)){
@@ -82,7 +86,8 @@ function SplitText(identifier, vars){
 			if(use.length==0){
 				this.vars.type = defaults.type;
 			} else {
-				this.vars.type = ",".join(use);
+				console.log(this);
+				this.vars.type = use.join(",");
 			}
 
 
@@ -103,9 +108,22 @@ function SplitText(identifier, vars){
 		//greensock's splittext doesn't allow static or null.  null will not set position and leave it to any css on the page
 		var allowedPositions = ["absolute","relative","static","fixed","inherit","initial",null];
 		this.vars.position = (vars.position && allowedPositions.indexOf(vars.position)!=-1)?vars.position:defaults.position;
-
+		console.log(this.vars.position);
 	}else{
 		this.vars = duplicateObject(defaults);
+		console.log(this.vars);
+	}
+
+	//Store the original state so we can revert easily
+	for(var i = 0;i<this.HTMLobjects;i++){
+		this.originalHTML[i]=this.HTMLobjects[i].innerHTML;
+	}
+
+	//add the revert function
+	this.revert = function(){
+		for(var i = 0;i<this.HTMLobjects;i++){
+			this.HTMLobjects[i].innerHTML=this.originalHTML[i];
+		}
 	}
 
 
@@ -113,15 +131,60 @@ function SplitText(identifier, vars){
 	//By now we should have an array at this.HTMLobjects of html objects that need spliting.
 	//	
 
-
-	for(var i = 0;i<this.HTMLobjects;i++){
-		this.originalHTML[i]=this.HTMLobjects[i].innerHTML;
+	//regex match spaces and non space characters
+	//can't use this for 
+	var regex = {
+		wordbreak: / /gm,
+		charbreak: /[^\s]/gm
 	}
 
-	this.revert = function(){
-		for(var i = 0;i<this.HTMLobjects;i++){
-			this.HTMLobjects[i].innerHTML=this.originalHTML[i];
+	this.vars.type = this.vars.type.split(",");
+
+	for(var i = 0;i<this.HTMLobjects.length;i++){
+
+		//Split Lines
+		if(this.vars.type.indexOf("lines")!=-1){
+			var current = this.HTMLobjects[i];
+			var startTag = "<div style='position:" + this.vars.position + "; display:block;' " + ((this.vars.wordsClass!==undefined && this.vars.wordsClass!="undefined")?"class='"+this.vars.wordsClass+"' ":"") + ">";
+			var endTag = "</div>";
+			var text = current.innerHTML;
+			var words = text.split(' ');
+			var splitPoints = [];
+			current.innerHTML = words[0];
+			var height = current.offsetHeight;
+
+			//work out where the splits are
+			for(var j = 1; j < words.length; j++){
+			    current.innerHTML = current.innerHTML + ' ' + words[j];
+			    if(current.offsetHeight > height){
+			        height = current.offsetHeight;
+			        splitPoints.push(current.innerHTML.length);
+			    }
+			}
+
+			//add the text to the element, adding in the tags
+
+			current.innerHTML = "";
+
+			for(var j = 0; j < splitPoints.length; j++){
+			   	var lineStart = (j==0)?0:splitPoints[j-1]+1;
+			   	var lineEnd = (j==splitPoints.length-1)?text.length-1:splitPoints[j];
+			   	current.innerHTML += startTag + text.substring(lineStart,lineEnd) + endTag;
+			   	console.log(current.innerHTML);
+			}
+
+
+
+
+
+			
+
 		}
 	}
+
+
+	
+
+	
 
 }
