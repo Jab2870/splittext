@@ -24,6 +24,7 @@ function SplitText(identifier, vars){
 
 	this.HTMLobjects=[];
 	this.vars;
+	this.originalHTML = [];
 
 	//if the identifier isn't an array, make it one.  If it already is, don't worry.  :)
 	if(!Array.isArray(identifier)){
@@ -40,7 +41,7 @@ function SplitText(identifier, vars){
 		}
 
 		//if jquery Element add each html Element
-		if (identifier[i] && (identifier[i] instanceof jQuery || identifier[i].constructor.prototype.jquery)) {
+		if (window.jQuery && identifier[i] && (identifier[i] instanceof jQuery || identifier[i].constructor.prototype.jquery)) {
 			//itterate through array of html elements inside jquery object
 			for(var j = 0; j<identifier[i].length;j++){
 				//Check that it is an html element before appending it
@@ -100,7 +101,7 @@ function SplitText(identifier, vars){
 		this.vars.linesClass = (vars.linesClass && typeof vars.linesClass == "string")?vars.linesClass:defaults.linesClass;
 
 		//greensock's splittext doesn't allow static or null.  null will not set position and leave it to any css on the page
-		var allowedPositions = ["absolute","relative","static",null];
+		var allowedPositions = ["absolute","relative","static","fixed","inherit","initial",null];
 		this.vars.position = (vars.position && allowedPositions.indexOf(vars.position)!=-1)?vars.position:defaults.position;
 
 	}else{
@@ -111,4 +112,16 @@ function SplitText(identifier, vars){
 	//
 	//By now we should have an array at this.HTMLobjects of html objects that need spliting.
 	//	
+
+
+	for(var i = 0;i<this.HTMLobjects;i++){
+		this.originalHTML[i]=this.HTMLobjects[i].innerHTML;
+	}
+
+	this.revert = function(){
+		for(var i = 0;i<this.HTMLobjects;i++){
+			this.HTMLobjects[i].innerHTML=this.originalHTML[i];
+		}
+	}
+
 }
