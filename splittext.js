@@ -86,7 +86,6 @@ function SplitText(identifier, vars){
 			if(use.length==0){
 				this.vars.type = defaults.type;
 			} else {
-				console.log(this);
 				this.vars.type = use.join(",");
 			}
 
@@ -108,10 +107,8 @@ function SplitText(identifier, vars){
 		//greensock's splittext doesn't allow static or null.  null will not set position and leave it to any css on the page
 		var allowedPositions = ["absolute","relative","static","fixed","inherit","initial",null];
 		this.vars.position = (vars.position && allowedPositions.indexOf(vars.position)!=-1)?vars.position:defaults.position;
-		console.log(this.vars.position);
 	}else{
 		this.vars = duplicateObject(defaults);
-		console.log(this.vars);
 	}
 
 	//Store the original state so we can revert easily
@@ -141,11 +138,17 @@ function SplitText(identifier, vars){
 	this.vars.type = this.vars.type.split(",");
 
 	for(var i = 0;i<this.HTMLobjects.length;i++){
+			
+		var current = this.HTMLobjects[i];
+		var currentLists = {
+			lines:[],
+			words:[],
+			chars:[]
+		};
 
 		//Split Lines
 		if(this.vars.type.indexOf("lines")!=-1){
-			var current = this.HTMLobjects[i];
-			var startTag = "<div style='position:" + this.vars.position + "; display:block;' " + ((this.vars.wordsClass!==undefined && this.vars.wordsClass!="undefined")?"class='"+this.vars.wordsClass+"' ":"") + ">";
+			var startTag = "<div style='position:" + this.vars.position + "; display:block;' " + ((this.vars.linesClass!==undefined && this.vars.linesClass!="undefined")?"class='"+this.vars.linesClass+"' ":"") + ">";
 			var endTag = "</div>";
 			var text = current.innerHTML;
 			var words = text.split(' ');
@@ -158,28 +161,61 @@ function SplitText(identifier, vars){
 			    current.innerHTML = current.innerHTML + ' ' + words[j];
 			    if(current.offsetHeight > height){
 			        height = current.offsetHeight;
-			        splitPoints.push(current.innerHTML.length);
+			        splitPoints.push(current.innerHTML.length - (words[j].length+1));
 			    }
 			}
+			//add the last line
+			splitPoints.push(current.innerHTML.length);
 
 			//add the text to the element, adding in the tags
 
 			current.innerHTML = "";
 
+
 			for(var j = 0; j < splitPoints.length; j++){
 			   	var lineStart = (j==0)?0:splitPoints[j-1]+1;
 			   	var lineEnd = (j==splitPoints.length-1)?text.length-1:splitPoints[j];
-			   	current.innerHTML += startTag + text.substring(lineStart,lineEnd) + endTag;
-			   	console.log(current.innerHTML);
+
+
+			   	var div = document.createElement("div");
+			   	div.style.position = this.vars.position;
+			   	div.style.display = "block";
+			   	if(this.vars.linesClass!==undefined && this.vars.linesClass!="undefined"){
+			   		this.class = this.vars.linesClass.replace("++",j+1);
+			   	}
+			   	div.innerHTML = text.substring(lineStart,lineEnd)
+
+			   	current.appendChild(div);
+
+			   	currentLists.lines.push(div);
+
+			}
+		}
+
+
+		//split the words
+
+		
+
+		if(this.vars.type.indexOf("words")!=-1){
+			function splitWords(parent){
+				console.log(parent);
+			}
+
+			//if it has been split by lines, split each line by words
+			if(this.vars.type.indexOf("lines")!=-1){
+				for(var j = 0; j<currentLists.lines.length;j++){
+					splitWords(currentLists.lines[j]);
+				}
+			} else {
+				splitWords(current);
 			}
 
 
-
-
-
-			
-
 		}
+
+
+
 	}
 
 
