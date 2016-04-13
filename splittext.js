@@ -117,13 +117,13 @@ function SplitText(identifier, vars){
 	}
 
 	//Store the original state so we can revert easily
-	for(var i = 0;i<this.HTMLobjects;i++){
+	for(var i = 0;i<this.HTMLobjects.length;i++){
 		this.originalHTML[i]=this.HTMLobjects[i].innerHTML;
 	}
 
 	//add the revert function
 	this.revert = function(){
-		for(var i = 0;i<this.HTMLobjects;i++){
+		for(var i = 0;i<this.HTMLobjects.length;i++){
 			this.HTMLobjects[i].innerHTML=this.originalHTML[i];
 		}
 	}
@@ -202,6 +202,8 @@ function SplitText(identifier, vars){
 			}
 		}
 
+		console.log(currentLists);
+
 
 
 
@@ -213,7 +215,11 @@ function SplitText(identifier, vars){
 				var endTag = "</div>";
 				parent.innerHTML = startTag + parent.innerHTML.replaceAll(" ",(endTag+ " " +startTag)) + endTag;
 
-				
+				var nodes = parent.querySelectorAll("div");
+
+				for(var j = 0; j<nodes.length;j++){
+					currentLists.words.push(nodes[j]);
+				}
 			}
 
 			//if it has been split by lines, split each line by words
@@ -229,9 +235,47 @@ function SplitText(identifier, vars){
 		}
 
 
-		this.lines.concat(currentLists.lines);
-		this.words.concat(currentLists.words);
-		this.chars.concat(currentLists.chars);
+
+		//split the characters
+		if(this.vars.type.indexOf("chars")!=-1){
+			function splitChars(parent,st){
+				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;' " + ((st.vars.charsClass!==undefined && st.vars.charsClass!="undefined")?"class='"+this.vars.charsClass+"' ":"") + ">";
+				var endTag = "</div>";
+				parent.innerHTML = startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag;
+				// console.log(parent.innerHTML);
+				// console.log(parent.innerHTML.split(""));
+				// console.log(parent.innerHTML.split("").join(endTag+startTag));
+				// console.log(startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag);
+				// console.log("******");
+
+				var nodes = parent.querySelectorAll("div");
+
+				for(var j = 0; j<nodes.length;j++){
+					currentLists.chars.push(nodes[j]);
+				}
+			}
+
+			//if it has been split by words, split each word by characters
+			//if it has only be split by lines, split each line by characters
+			if(this.vars.type.indexOf("words")!=-1){
+				for(var j = 0; j<currentLists.words.length;j++){
+					splitChars(currentLists.words[j], this);
+				}
+			} else if(this.vars.type.indexOf("lines")!=-1){
+				for(var j = 0; j<currentLists.lines.length;j++){
+					splitChars(currentLists.lines[j], this);
+				}
+			} else {
+				splitChars(current, this);
+			}
+
+
+		}
+
+
+		this.lines = this.lines.concat(currentLists.lines);
+		this.words = this.words.concat(currentLists.words);
+		this.chars = this.chars.concat(currentLists.chars);
 
 	}
 
