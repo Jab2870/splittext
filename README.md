@@ -37,12 +37,14 @@ Two adjacent plus symbols in the class will be replaced by position of that spli
 
 
 Two adjacent asterisks symbols in the charClass will be replaced by the character and the next character.   For example the word `hello` split with the charClass `**` would produce the character elements
+
 ```html
 <div class='he'>h</div>
 <div class='el'>e</div>
 <div class='ll'>l</div>
 <div class='lo'>l</div>
-<div>o</div>```
+<div>o</div>
+```
 
 This makes it very easy to adjust the spacing between letters for advanced typography.  If, for example, you wanted to change the spacing between the letters c and d, you would use the CSS
 
