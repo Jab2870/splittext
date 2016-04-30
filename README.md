@@ -31,18 +31,19 @@ Type is a comma separated list list of the type of split to be carried out.  The
 The three class elements will add a class to each of the split elements.
 
 Two adjacent plus symbols in the class will be replaced by position of that split element.  For example, `new SplitText("#elementID",{linesChars:"line++"})` would produce the line elements
-`<div class="line1>...</div>`
-`<div class="line2>...</div>`
-`<div class="line3>...</div>`
-
+```html
+<div class="line1">...</div>
+<div class="line2">...</div>
+<div class="line3">...</div>
+```
 
 Two adjacent asterisks symbols in the charClass will be replaced by the character and the next character.   For example the word `hello` split with the charClass `**` would produce the character elements
 
 ```html
-<div class='he'>h</div>
-<div class='el'>e</div>
-<div class='ll'>l</div>
-<div class='lo'>l</div>
+<div class="he">h</div>
+<div class="el">e</div>
+<div class="ll">l</div>
+<div class="lo">l</div>
 <div>o</div>
 ```
 
