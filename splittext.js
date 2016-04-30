@@ -184,7 +184,7 @@ function SplitText(identifier, vars){
 
 			for(var j = 0; j < splitPoints.length; j++){
 			   	var lineStart = (j==0)?0:splitPoints[j-1]+1;
-			   	var lineEnd = (j==splitPoints.length-1)?text.length-1:splitPoints[j];
+			   	var lineEnd = (j==splitPoints.length-1)?text.length:splitPoints[j];
 
 
 			   	var div = document.createElement("div");
