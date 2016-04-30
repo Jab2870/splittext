@@ -17,6 +17,22 @@ function SplitText(identifier, vars){
 	    return target.split(search).join(replacement);
 	};
 
+	function hasClass(obj, c) {
+	  return new RegExp('(\\s|^)' + c + '(\\s|$)').test(obj.className);
+	}
+
+	function addClass(obj, c) {
+	  if (!hasClass(obj, c)) {
+	    obj.className += ' ' + c;
+	  }
+	}
+
+	function removeClass(obj, c) {
+	  if (hasClass(obj, c)) {
+	    obj.className = obj.className.replace(new RegExp('(\\s|^)' + c + '(\\s|$)'), ' ').replace(/\s+/g, ' ').replace(/^\s|\s$/, '');
+	  }
+	}
+
 	var identifier = identifier || [];
 	var defaults = {
 		type: "chars,words,lines",
@@ -210,13 +226,16 @@ function SplitText(identifier, vars){
 		//split the words
 		if(this.vars.type.indexOf("words")!=-1){
 			function splitWords(parent,st){
-				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;' " + ((st.vars.wordsClass!==undefined && st.vars.wordsClass!="undefined")?"class='"+this.vars.wordsClass+"' ":"") + ">";
+				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;'>";
 				var endTag = "</div>";
 				parent.innerHTML = startTag + parent.innerHTML.replaceAll(" ",(endTag+ " " +startTag)) + endTag;
 
 				var nodes = parent.querySelectorAll("div");
 
 				for(var j = 0; j<nodes.length;j++){
+					if(st.vars.wordsClass!==undefined && st.vars.wordsClass!="undefined"){
+						addClass(nodes[j],st.vars.wordsClass.replaceAll("++",j+1));
+					}
 					currentLists.words.push(nodes[j]);
 				}
 			}
@@ -238,13 +257,22 @@ function SplitText(identifier, vars){
 		//split the characters
 		if(this.vars.type.indexOf("chars")!=-1){
 			function splitChars(parent,st){
-				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;' " + ((st.vars.charsClass!==undefined && st.vars.charsClass!="undefined")?"class='"+this.vars.charsClass+"' ":"") + ">";
+				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;'>";
 				var endTag = "</div>";
 				parent.innerHTML = startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag;
 
 				var nodes = parent.querySelectorAll("div");
 
 				for(var j = 0; j<nodes.length;j++){
+					if(st.vars.charsClass!==undefined && st.vars.charsClass!="undefined"){
+						var newClass = st.vars.charsClass.replaceAll("++",j+1);
+						if(j!=nodes.length-1){
+							newClass = newClass.replaceAll("**",nodes[j].innerHTML+nodes[j+1].innerHTML);
+						} else {
+							newClass=newClass.replaceAll("**","");
+						}
+						addClass(nodes[j],newClass);
+					}
 					currentLists.chars.push(nodes[j]);
 				}
 			}
