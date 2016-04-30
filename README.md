@@ -45,9 +45,9 @@ Two adjacent asterisks symbols in the charClass will be replaced by the characte
 
 This makes it very easy to adjust the spacing between letters for advanced typography.  If, for example, you wanted to change the spacing between the letters c and d, you would use the CSS
 
-```` .cd{
+``` .cd{
     letter-spacing:-0.1em;
- }````
+ }```
 
 ## Contributing
 1. Fork it!
