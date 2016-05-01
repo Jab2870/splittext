@@ -33,6 +33,35 @@ function SplitText(identifier, vars){
 	  }
 	}
 
+	function findPos(node) {
+    var node = node; 	
+    var curtop = 0;
+    var curtopscroll = 0;
+    var curleft = 0;
+    var curleftscroll = 0;
+    var needHTML = true;
+    if (node.offsetParent) {
+        do {
+        	if(node.offsetParent && node.offsetParent == document.getElementsByTagName("html")[0]){
+        		needHTML = false;
+        	}
+            curtop += node.offsetTop;
+            curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+            curleft += node.offsetLeft;
+            curleftscroll += node.offsetParent ? node.offsetParent.scrollLeft : 0;
+        } while (node = node.offsetParent);
+
+        if(needHTML){
+        	curtopscroll += document.getElementsByTagName("html")[0].scrollTop;
+        	curleftscroll += document.getElementsByTagName("html")[0].scrollLeft;
+        }
+        
+
+
+        return [curleft - curleftscroll, curtop - curtopscroll];
+    }
+}
+
 	var identifier = identifier || [];
 	var defaults = {
 		type: "chars,words,lines",
@@ -174,8 +203,6 @@ function SplitText(identifier, vars){
 
 		//Split Lines
 		if(this.vars.type.indexOf("lines")!=-1){
-			var startTag = "<div style='position:" + this.vars.position + "; display:block;' " + ((this.vars.linesClass!==undefined && this.vars.linesClass!="undefined")?"class='"+this.vars.linesClass+"' ":"") + ">";
-			var endTag = "</div>";
 			var text = current.innerHTML;
 			var words = text.split(' ');
 			var splitPoints = [];
@@ -204,17 +231,40 @@ function SplitText(identifier, vars){
 
 
 			   	var div = document.createElement("div");
-			   	div.style.position = this.vars.position;
+
 			   	div.style.display = "block";
 			   	if(this.vars.linesClass!==undefined && this.vars.linesClass!="undefined"){
 			   		this.class = this.vars.linesClass.replace("++",j+1);
 			   	}
 			   	div.innerHTML = text.substring(lineStart,lineEnd)
-
 			   	current.appendChild(div);
+
+			   	if(this.vars.position !== null && this.vars.position!="absolute" && this.vars.position!="fixed"){
+			   		div.style.position = this.vars.position;
+			   	}
+
 
 			   	currentLists.lines.push(div);
 
+			}
+
+			if(this.vars.position == "absolute"){
+				for (var j = currentLists.lines.length - 1; j >= 0; j--) {
+					currentLists.lines[j].style.left = currentLists.lines[j].offsetLeft + "px";
+					currentLists.lines[j].style.top = currentLists.lines[j].offsetTop + "px";
+					currentLists.lines[j].style.width = currentLists.lines[j].offsetWidth + "px";
+					currentLists.lines[j].style.height = currentLists.lines[j].offsetHeight + "px";
+					currentLists.lines[j].style.position = "absolute";
+				}
+			} else if (this.vars.position == "fixed"){
+				for (var j = currentLists.lines.length - 1; j >= 0; j--) {
+					var pos = findPos(currentLists.lines[j]);
+					currentLists.lines[j].style.left = pos[0] + "px";
+					currentLists.lines[j].style.top = pos[1] + "px";
+					currentLists.lines[j].style.width = currentLists.lines[j].offsetWidth + "px";
+					currentLists.lines[j].style.height = currentLists.lines[j].offsetHeight + "px";
+					currentLists.lines[j].style.position = "fixed";
+				}
 			}
 		}
 
