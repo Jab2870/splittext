@@ -39,22 +39,23 @@ function SplitText(identifier, vars){
     var curtopscroll = 0;
     var curleft = 0;
     var curleftscroll = 0;
-    var needHTML = true;
+    //var needHTML = true;
     if (node.offsetParent) {
         do {
         	if(node.offsetParent && node.offsetParent == document.getElementsByTagName("html")[0]){
-        		needHTML = false;
+        		// needHTML = false;
         	}
             curtop += node.offsetTop;
             curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
             curleft += node.offsetLeft;
             curleftscroll += node.offsetParent ? node.offsetParent.scrollLeft : 0;
+
         } while (node = node.offsetParent);
 
-        if(needHTML){
-        	curtopscroll += document.getElementsByTagName("html")[0].scrollTop;
-        	curleftscroll += document.getElementsByTagName("html")[0].scrollLeft;
-        }
+        // if(needHTML){
+        // 	curtopscroll += document.getElementsByTagName("html")[0].scrollTop;
+        // 	curleftscroll += document.getElementsByTagName("html")[0].scrollLeft;
+        // }
         
 
 
@@ -239,33 +240,31 @@ function SplitText(identifier, vars){
 			   	div.innerHTML = text.substring(lineStart,lineEnd)
 			   	current.appendChild(div);
 
-			   	if(this.vars.position !== null && this.vars.position!="absolute" && this.vars.position!="fixed"){
-			   		div.style.position = this.vars.position;
-			   	}
 
+			   	if(this.vars.position !== null){
+			   		if(this.vars.position =="absolute"){
+			   			div.toBe = {
+			   				top: div.offsetTop,
+			   				left: div.offsetLeft
+			   			};
+			   			div.style.position = "relative";
+			   		} else if(this.vars.position =="fixed"){
+			   			var pos = findPos(div);
+			   			div.toBe = {
+			   				top: pos[1],
+			   				left: pos[0]
+			   			}
+			   			div.style.position = "relative";
+			   		} else {
+			   			div.style.position = this.vars.position;
+			   		}
+			   	}
 
 			   	currentLists.lines.push(div);
 
 			}
 
-			if(this.vars.position == "absolute"){
-				for (var j = currentLists.lines.length - 1; j >= 0; j--) {
-					currentLists.lines[j].style.left = currentLists.lines[j].offsetLeft + "px";
-					currentLists.lines[j].style.top = currentLists.lines[j].offsetTop + "px";
-					currentLists.lines[j].style.width = currentLists.lines[j].offsetWidth + "px";
-					currentLists.lines[j].style.height = currentLists.lines[j].offsetHeight + "px";
-					currentLists.lines[j].style.position = "absolute";
-				}
-			} else if (this.vars.position == "fixed"){
-				for (var j = currentLists.lines.length - 1; j >= 0; j--) {
-					var pos = findPos(currentLists.lines[j]);
-					currentLists.lines[j].style.left = pos[0] + "px";
-					currentLists.lines[j].style.top = pos[1] + "px";
-					currentLists.lines[j].style.width = currentLists.lines[j].offsetWidth + "px";
-					currentLists.lines[j].style.height = currentLists.lines[j].offsetHeight + "px";
-					currentLists.lines[j].style.position = "fixed";
-				}
-			}
+			
 		}
 
 
@@ -276,16 +275,36 @@ function SplitText(identifier, vars){
 		//split the words
 		if(this.vars.type.indexOf("words")!=-1){
 			function splitWords(parent,st){
-				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;'>";
+				var startTag = "<div style='display:inline-block;'>";
 				var endTag = "</div>";
 				parent.innerHTML = startTag + parent.innerHTML.replaceAll(" ",(endTag+ " " +startTag)) + endTag;
 
 				var nodes = parent.querySelectorAll("div");
 
-				for(var j = 0; j<nodes.length;j++){
+				for(var j = nodes.length-1; j>=0;j--){
 					if(st.vars.wordsClass!==undefined && st.vars.wordsClass!="undefined"){
 						addClass(nodes[j],st.vars.wordsClass.replaceAll("++",j+1));
 					}
+
+					if(st.vars.position !== null){
+				   		if(st.vars.position =="absolute"){
+				   			nodes[j].toBe = {
+				   				top: nodes[j].offsetTop,
+				   				left: nodes[j].offsetLeft
+				   			};
+				   			nodes[j].style.position = "relative";
+				   		} else if(st.vars.position =="fixed"){
+				   			var pos = findPos(nodes[j]);
+				   			nodes[j].toBe = {
+				   				top: pos[1],
+				   				left: pos[0]
+				   			}
+				   			nodes[j].style.position = "relative";
+				   		} else {
+				   			nodes[j].style.position = st.vars.position;
+				   		}
+			   		}
+
 					currentLists.words.push(nodes[j]);
 				}
 			}
@@ -307,7 +326,7 @@ function SplitText(identifier, vars){
 		//split the characters
 		if(this.vars.type.indexOf("chars")!=-1){
 			function splitChars(parent,st){
-				var startTag = "<div style='position:" + st.vars.position + "; display:inline-block;'>";
+				var startTag = "<div style='display:inline-block;'>";
 				var endTag = "</div>";
 				parent.innerHTML = startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag;
 
@@ -323,8 +342,29 @@ function SplitText(identifier, vars){
 						}
 						addClass(nodes[j],newClass);
 					}
+
+					if(st.vars.position !== null){
+				   		if(st.vars.position =="absolute"){
+				   			nodes[j].toBe = {
+				   				top: nodes[j].offsetTop,
+				   				left: nodes[j].offsetLeft
+				   			};
+				   			nodes[j].style.position = "relative";
+				   		} else if(st.vars.position =="fixed"){
+				   			var pos = findPos(nodes[j]);
+				   			nodes[j].toBe = {
+				   				top: pos[1],
+				   				left: pos[0]
+				   			}
+				   			nodes[j].style.position = "relative";
+				   		} else {
+				   			nodes[j].style.position = st.vars.position;
+				   		}
+			   		}
+
 					currentLists.chars.push(nodes[j]);
 				}
+
 			}
 
 			//if it has been split by words, split each word by characters
@@ -343,6 +383,43 @@ function SplitText(identifier, vars){
 
 
 		}
+
+
+		if(this.vars.position == "absolute" || this.vars.position == "fixed"){
+			for (var j = currentLists.chars.length - 1; j >= 0; j--) {
+				currentLists.chars[j].style.width = currentLists.chars[j].offsetWidth + "px";
+				currentLists.chars[j].style.height = currentLists.chars[j].offsetHeight + "px";
+				currentLists.chars[j].style.left = currentLists.chars[j].toBe.left + "px";
+				currentLists.chars[j].style.top = currentLists.chars[j].toBe.top + "px";
+			}
+
+			for (var j = currentLists.words.length - 1; j >= 0; j--) {
+				currentLists.words[j].style.width = currentLists.words[j].offsetWidth + "px";
+				currentLists.words[j].style.height = currentLists.words[j].offsetHeight + "px";
+				currentLists.words[j].style.left = currentLists.words[j].toBe.left + "px";
+				currentLists.words[j].style.top = currentLists.words[j].toBe.top + "px";
+			}
+
+			for (var j = currentLists.lines.length - 1; j >= 0; j--) {
+				currentLists.lines[j].style.width = currentLists.lines[j].offsetWidth + "px";
+				currentLists.lines[j].style.height = currentLists.lines[j].offsetHeight + "px";
+				currentLists.lines[j].style.left = currentLists.lines[j].toBe.left + "px";
+				currentLists.lines[j].style.top = currentLists.lines[j].toBe.top + "px";
+			}
+
+			for (var j = currentLists.chars.length - 1; j >= 0; j--) {
+				currentLists.chars[j].style.position = this.vars.position;
+			}
+
+			for (var j = currentLists.words.length - 1; j >= 0; j--) {
+				currentLists.words[j].style.position = this.vars.position;
+			}
+
+			for (var j = currentLists.lines.length - 1; j >= 0; j--) {
+				currentLists.lines[j].style.position = this.vars.position;
+			}
+		}
+		
 
 
 		this.lines = this.lines.concat(currentLists.lines);
