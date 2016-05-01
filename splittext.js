@@ -281,7 +281,7 @@ function SplitText(identifier, vars){
 
 				var nodes = parent.querySelectorAll("div");
 
-				for(var j = nodes.length-1; j>=0;j--){
+				for(var j = 0; j<nodes.length;j++){
 					if(st.vars.wordsClass!==undefined && st.vars.wordsClass!="undefined"){
 						addClass(nodes[j],st.vars.wordsClass.replaceAll("++",j+1));
 					}
