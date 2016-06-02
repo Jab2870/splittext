@@ -17,6 +17,8 @@ function SplitText(identifier, vars){
 	    return target.split(search).join(replacement);
 	};
 
+
+
 	function hasClass(obj, c) {
 	  return new RegExp('(\\s|^)' + c + '(\\s|$)').test(obj.className);
 	}
@@ -34,34 +36,34 @@ function SplitText(identifier, vars){
 	}
 
 	function findPos(node) {
-    var node = node; 	
-    var curtop = 0;
-    var curtopscroll = 0;
-    var curleft = 0;
-    var curleftscroll = 0;
-    //var needHTML = true;
-    if (node.offsetParent) {
-        do {
-        	if(node.offsetParent && node.offsetParent == document.getElementsByTagName("html")[0]){
-        		// needHTML = false;
-        	}
-            curtop += node.offsetTop;
-            curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
-            curleft += node.offsetLeft;
-            curleftscroll += node.offsetParent ? node.offsetParent.scrollLeft : 0;
+	    var node = node; 	
+	    var curtop = 0;
+	    var curtopscroll = 0;
+	    var curleft = 0;
+	    var curleftscroll = 0;
+	    //var needHTML = true;
+	    if (node.offsetParent) {
+	        do {
+	        	if(node.offsetParent && node.offsetParent == document.getElementsByTagName("html")[0]){
+	        		// needHTML = false;
+	        	}
+	            curtop += node.offsetTop;
+	            curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+	            curleft += node.offsetLeft;
+	            curleftscroll += node.offsetParent ? node.offsetParent.scrollLeft : 0;
 
-        } while (node = node.offsetParent);
+	        } while (node = node.offsetParent);
 
-        // if(needHTML){
-        // 	curtopscroll += document.getElementsByTagName("html")[0].scrollTop;
-        // 	curleftscroll += document.getElementsByTagName("html")[0].scrollLeft;
-        // }
-        
+	        // if(needHTML){
+	        // 	curtopscroll += document.getElementsByTagName("html")[0].scrollTop;
+	        // 	curleftscroll += document.getElementsByTagName("html")[0].scrollLeft;
+	        // }
+	        
 
 
-        return [curleft - curleftscroll, curtop - curtopscroll];
-    }
-}
+	        return [curleft - curleftscroll, curtop - curtopscroll];
+	    }
+	}
 
 	var identifier = identifier || [];
 	var defaults = {
@@ -317,8 +319,6 @@ function SplitText(identifier, vars){
 			} else {
 				splitWords(current, this);
 			}
-
-
 		}
 
 
@@ -328,7 +328,8 @@ function SplitText(identifier, vars){
 			function splitChars(parent,st){
 				var startTag = "<div style='display:inline-block;'>";
 				var endTag = "</div>";
-				parent.innerHTML = startTag + parent.innerHTML.split("").join(endTag+startTag) + endTag;
+				var specials = (parent.innerHTML.match(/(&\w+;)/g));
+				parent.innerHTML = startTag + parent.innerHTML.replace(/&\w+;/g,"ህ").split("").join(endTag+startTag) + endTag;
 
 				var nodes = parent.querySelectorAll("div");
 
@@ -360,6 +361,11 @@ function SplitText(identifier, vars){
 				   		} else {
 				   			nodes[j].style.position = st.vars.position;
 				   		}
+			   		}
+
+			   		if(nodes[j].innerHTML=="ህ"){
+			   			nodes[j].innerHTML = specials[0];
+			   			specials.splice(0,1);
 			   		}
 
 					currentLists.chars.push(nodes[j]);
